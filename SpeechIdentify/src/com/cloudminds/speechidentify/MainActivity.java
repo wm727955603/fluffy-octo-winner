@@ -102,7 +102,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			super.handleMessage(msg);
 			switch (msg.what) {
 			case 0:
-				listening();
+				if (!text_page)
+					listening();
 				break;
 			}
 
@@ -118,8 +119,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		initListener();
 		initData();
 
-		mIat = SpeechRecognizer.createRecognizer(MainActivity.this, mInitListener);
-		mTts = SpeechSynthesizer.createSynthesizer(MainActivity.this, mTtsInitListener);
+		mIat = SpeechRecognizer.createRecognizer(MainActivity.this,
+				mInitListener);
+		mTts = SpeechSynthesizer.createSynthesizer(MainActivity.this,
+				mTtsInitListener);
 
 		playerUtil = new PlayerUtil();
 
@@ -136,15 +139,18 @@ public class MainActivity extends Activity implements OnClickListener {
 		mChoiceText = (TextView) findViewById(R.id.tv_choice);
 
 		viewPager = (ViewPager) findViewById(R.id.viewPager);
-		voiceView = LayoutInflater.from(this).inflate(R.layout.part_voice, null);
+		voiceView = LayoutInflater.from(this)
+				.inflate(R.layout.part_voice, null);
 		textView = LayoutInflater.from(this).inflate(R.layout.part_text, null);
 
 		// 频谱
-		spectrum_voice = (VoiceSpectrum) voiceView.findViewById(R.id.spectrum_voice);
+		spectrum_voice = (VoiceSpectrum) voiceView
+				.findViewById(R.id.spectrum_voice);
 		btn_asr = (Button) voiceView.findViewById(R.id.btn_asr);
 		btn_rec_1 = (Button) voiceView.findViewById(R.id.btn_rec_1);
 		btn_rec_2 = (Button) voiceView.findViewById(R.id.btn_rec_2);
-		btn_send_message = (ImageView) textView.findViewById(R.id.btn_send_message);
+		btn_send_message = (ImageView) textView
+				.findViewById(R.id.btn_send_message);
 		et_content = (EditText) textView.findViewById(R.id.et_content);
 	}
 
@@ -190,6 +196,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				text_page = true;
 				mTts.destroy();
 				mIat.destroy();
+				playerUtil.stop();
+				playerUtil.release();
 				break;
 			}
 		}
@@ -212,7 +220,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		try {
 			if (inputMethodManager.isActive()) {
-				inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(),
+				inputMethodManager.hideSoftInputFromWindow(getCurrentFocus()
+						.getApplicationWindowToken(),
 						InputMethodManager.HIDE_NOT_ALWAYS);
 			}
 			;
@@ -231,7 +240,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			// 显示听写对话框
 			mIatDialog.setListener(mRecognizerDialogListener);
 			mIatDialog.show();
-			mToast.makeText(MainActivity.this, getString(R.string.text_begin), Toast.LENGTH_LONG).show();
+			mToast.makeText(MainActivity.this, getString(R.string.text_begin),
+					Toast.LENGTH_LONG).show();
 		} else {
 			// 不显示听写对话框
 			ret = mIat.startListening(mRecognizerListener);
@@ -239,7 +249,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				Toast.makeText(MainActivity.this, "听写失败,错误码：" + ret, 0).show();
 				;
 			} else {
-				Toast.makeText(MainActivity.this, getString(R.string.text_begin), 0).show();
+				Toast.makeText(MainActivity.this,
+						getString(R.string.text_begin), 0).show();
 				;
 			}
 		}
@@ -256,7 +267,6 @@ public class MainActivity extends Activity implements OnClickListener {
 			if (code != ErrorCode.SUCCESS) {
 				Log.e(TAG, "初始化失败，错误码：" + code);
 			}
-			Toast.makeText(MainActivity.this, "初始化成功", 1).show();
 		}
 	};
 
@@ -304,7 +314,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 				speakTimer = new Timer(true);
 				speakTask = new MySpeakTask();
-				speakTimer.schedule(speakTask, 1000);
+				speakTimer.schedule(speakTask, 100);
 			} else {
 				if (timeCount < 3) {
 					speak(getResources().getString(R.string.help));
@@ -333,8 +343,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		public void onResult(RecognizerResult results, boolean isLast) {
 			Log.d(TAG, results.getResultString());
 			String contentText = printResult(results);
-			if (contentText != null && !"".equals(contentText.trim()) && contentText.length() > 1) {
-				showTip("内容不是为空");
+			if (contentText != null && !"".equals(contentText.trim())
+					&& contentText.length() > 1) {
 				mResultText.setText(null);// 清空显示内容
 				mIatResults.clear();
 				mResultText.setText(contentText);
@@ -344,10 +354,6 @@ public class MainActivity extends Activity implements OnClickListener {
 				showVoice(1);
 				speak(choiceText);
 			} else {
-				showTip("内容为空");
-				mResultText.setText(null);// 清空显示内容
-				mIatResults.clear();
-				mResultText.setText("没有说话");
 				listening();
 			}
 			// }
@@ -389,7 +395,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 
 		@Override
-		public void onBufferProgress(int percent, int beginPos, int endPos, String info) {
+		public void onBufferProgress(int percent, int beginPos, int endPos,
+				String info) {
 			// 合成进度
 		}
 
@@ -412,7 +419,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				speakTimer = new Timer(true);
 				speakTask = new MySpeakTask();
 				speakTimer.schedule(speakTask, 2000);
-				if (!playerUtil.isPlayering()) {
+				if (!playerUtil.isPlayering() && !text_page) {
 					listening();
 				}
 			} else {
@@ -465,7 +472,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		for (String key : mIatResults.keySet()) {
 			resultBuffer.append(mIatResults.get(key));
 		}
-		showTip(resultBuffer.toString());
 		return resultBuffer.toString();
 	}
 
@@ -524,7 +530,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		// 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
 		// 注：AUDIO_FORMAT参数语记需要更新版本才能生效
 		mIat.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
-		mIat.setParameter(SpeechConstant.ASR_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/iat.wav");
+		mIat.setParameter(SpeechConstant.ASR_AUDIO_PATH,
+				Environment.getExternalStorageDirectory() + "/msc/iat.wav");
 	}
 
 	/**
@@ -538,7 +545,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		mTts.setParameter(SpeechConstant.PARAMS, null);
 		// 根据合成引擎设置相应参数
 		if (mEngineType.equals(SpeechConstant.TYPE_CLOUD)) {
-			mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
+			mTts.setParameter(SpeechConstant.ENGINE_TYPE,
+					SpeechConstant.TYPE_CLOUD);
 			// 设置在线合成发音人
 			mTts.setParameter(SpeechConstant.VOICE_NAME, voicer);
 			// 设置合成语速
@@ -548,7 +556,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			// 设置合成音量
 			mTts.setParameter(SpeechConstant.VOLUME, "50");
 		} else {
-			mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_LOCAL);
+			mTts.setParameter(SpeechConstant.ENGINE_TYPE,
+					SpeechConstant.TYPE_LOCAL);
 			// 设置本地合成发音人 voicer为空，默认通过语记界面指定发音人。
 			mTts.setParameter(SpeechConstant.VOICE_NAME, "");
 			/**
@@ -563,7 +572,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		// 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
 		// 注：AUDIO_FORMAT参数语记需要更新版本才能生效
 		mTts.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
-		mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/tts.wav");
+		mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH,
+				Environment.getExternalStorageDirectory() + "/msc/tts.wav");
 	}
 
 	private void showTip(final String str) {
@@ -639,9 +649,46 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		if(mIat.isListening()){
+			mIat.cancel();
+			mIat.destroy();
+		}
+
+		showVoice(1);
+		mTts.stopSpeaking();
+		// 退出时释放连接
+		mTts.destroy();
+		playerUtil.stop();
+		playerUtil.release();
+		if (speakTimer != null) {
+			speakTimer.cancel();
+		}
+		if (speakTask != null) {
+			speakTask.cancel();
+		}
+	}
+
+	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
+		if(mIat.isListening()){
+			mIat.cancel();
+			mIat.destroy();
+		}
+		showVoice(1);
+		mTts.stopSpeaking();
+		// 退出时释放连接
+		mTts.destroy();
+		if (speakTimer != null) {
+			speakTimer.cancel();
+		}
+		if (speakTask != null) {
+			speakTask.cancel();
+		}
 		playerUtil.stop();
 		playerUtil.release();
 	}
@@ -650,15 +697,21 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onDestroy() {
 		super.onDestroy();
 		// 退出时释放连接
-		mIat.cancel();
-		mIat.destroy();
+		if(mIat.isListening()){
+			mIat.cancel();
+			mIat.destroy();
+		}
 
 		showVoice(1);
 		mTts.stopSpeaking();
 		// 退出时释放连接
 		mTts.destroy();
-		speakTask = null;
-		speakTimer = null;
+		if (speakTimer != null) {
+			speakTimer.cancel();
+		}
+		if (speakTask != null) {
+			speakTask.cancel();
+		}
 		playerUtil.stop();
 		playerUtil.release();
 	}
@@ -673,7 +726,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			if (TextUtils.isEmpty(content)) {
 				showTip("您输入的内容为空。");
 			} else {
+				mResultText.setText(null);
+				mChoiceText.setText(null);
 				mResultText.setText(content);
+				mChoiceText.setText(content);
+				speak(content);
 				et_content.setText("");
 			}
 			break;
