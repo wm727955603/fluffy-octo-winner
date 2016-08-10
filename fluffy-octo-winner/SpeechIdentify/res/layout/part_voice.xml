@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/voice_llt_bottom_height1" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" >
+
+        <RelativeLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rlt_asr">
+            <Button
+            android:id="@+id/btn_asr"
+            android:layout_width="@dimen/voice_iv_voice_anim"
+            android:layout_height="@dimen/voice_iv_voice_anim"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:background="@drawable/ic_saying" />
+        <Button
+            android:id="@+id/btn_rec_1"
+            android:layout_width="@dimen/voice_iv_voice_anim"
+            android:layout_height="@dimen/voice_iv_voice_anim"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:background="@drawable/ic_recognize_1" />
+        <Button
+            android:id="@+id/btn_rec_2"
+            android:layout_width="@dimen/voice_iv_voice_anim"
+            android:layout_height="@dimen/voice_iv_voice_anim"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:background="@drawable/ic_recognize_2" />
+        <com.cloudminds.speechidentify.VoiceSpectrum
+            android:id="@+id/spectrum_voice"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="55dp" />
+        </RelativeLayout>
+        
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rlt_asr"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp" >
+
+            <Button
+                android:id="@+id/btn_voice"
+                android:layout_width="@dimen/part_voice_width"
+                android:layout_height="@dimen/part_voice_height"
+                android:background="@drawable/ic_voice_press" />
+
+            <Button
+                android:id="@+id/btn_text"
+                android:layout_width="@dimen/part_voice_width"
+                android:layout_height="@dimen/part_voice_height"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/btn_text_selector" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>
